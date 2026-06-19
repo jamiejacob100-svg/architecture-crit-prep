@@ -26,7 +26,7 @@ export default function DefenseStage({ project, patch }) {
   return (
     <div className="stage">
       <div className="stage-head">
-        <div className="stage-eyebrow">Stage 5</div>
+        <div className="stage-eyebrow">Stage 6</div>
         <h2>Defense drill</h2>
         <p>The Q&amp;A is where crits are won or lost. Build a question bank for <em>this</em> project — especially the two or three questions you’d least like to be asked — and rehearse the answers.</p>
       </div>

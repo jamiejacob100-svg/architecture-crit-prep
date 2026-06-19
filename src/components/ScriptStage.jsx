@@ -33,7 +33,7 @@ export default function ScriptStage({ project, patch }) {
   return (
     <div className="stage">
       <div className="stage-head">
-        <div className="stage-eyebrow">Stage 4</div>
+        <div className="stage-eyebrow">Stage 5</div>
         <h2>Speaking script</h2>
         <p>A script paced to your {project.intake.timeLimit || '—'}-minute limit, with timing and board cues so it’s usable while standing at the wall. Leave room — students almost always overrun.</p>
       </div>

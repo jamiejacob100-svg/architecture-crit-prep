@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { STAGES } from './data/content.js';
 import { useProject } from './lib/useProject.js';
 import IntakeStage from './components/IntakeStage.jsx';
 import NarrativeStage from './components/NarrativeStage.jsx';
 import BoardStage from './components/BoardStage.jsx';
+import DrawingLayoutStage from './components/DrawingLayoutStage.jsx';
 import ScriptStage from './components/ScriptStage.jsx';
 import DefenseStage from './components/DefenseStage.jsx';
 import OverviewStage from './components/OverviewStage.jsx';
@@ -25,6 +26,31 @@ export default function App() {
   const { project, patch, reset } = useProject();
   const [active, setActive] = useState('intake');
   const [drawer, setDrawer] = useState(false);
+  // Uploaded drawing images live here (not in localStorage — they'd blow the
+  // quota) so they survive switching between stages.
+  const [drawings, setDrawings] = useState([]);
+
+  // Dev-only hook so the layout compositor can be tested in the preview.
+  // import.meta.env.DEV is false in the production build, so this is stripped.
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      window.__critAddDrawing = (src, partial = {}) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const d = {
+              id: `t${Date.now()}${Math.random()}`,
+              src, name: partial.label || 'test', label: partial.label || 'test',
+              type: partial.type || 'plan', scale: partial.scale || '', board: partial.board || 1,
+              hero: !!partial.hero, naturalW: img.naturalWidth, naturalH: img.naturalHeight,
+            };
+            setDrawings((p) => [...p, d]);
+            resolve(d);
+          };
+          img.src = src;
+        });
+    }
+  }, []);
 
   const idx = STAGES.findIndex((s) => s.id === active);
   const prev = STAGES[idx - 1];
@@ -36,10 +62,14 @@ export default function App() {
     intake: <IntakeStage {...stageProps} />,
     narrative: <NarrativeStage {...stageProps} />,
     boards: <BoardStage {...stageProps} />,
+    layouts: <DrawingLayoutStage drawings={drawings} setDrawings={setDrawings} project={project} />,
     script: <ScriptStage {...stageProps} />,
     defense: <DefenseStage {...stageProps} />,
     overview: <OverviewStage project={project} />,
   }[active];
+
+  const doneFor = (id) =>
+    id === 'layouts' ? drawings.length > 0 : isDone(id, project);
 
   const onReset = () => {
     if (confirm('Clear all crit-prep data and start a new project? This cannot be undone.')) {
@@ -78,10 +108,10 @@ export default function App() {
         {STAGES.map((s) => (
           <button
             key={s.id}
-            className={`nav-item ${active === s.id ? 'active' : ''} ${isDone(s.id, project) ? 'done' : ''}`}
+            className={`nav-item ${active === s.id ? 'active' : ''} ${doneFor(s.id) ? 'done' : ''}`}
             onClick={() => go(s.id)}
           >
-            <span className="no">{isDone(s.id, project) && active !== s.id ? '✓' : s.no}</span>
+            <span className="no">{doneFor(s.id) && active !== s.id ? '✓' : s.no}</span>
             <span>
               <span className="t">{s.title}</span>
               <span className="b">{s.blurb}</span>

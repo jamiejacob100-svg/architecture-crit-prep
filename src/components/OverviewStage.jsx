@@ -31,7 +31,7 @@ export default function OverviewStage({ project }) {
   return (
     <div className="stage">
       <div className="stage-head">
-        <div className="stage-eyebrow">Stage 6</div>
+        <div className="stage-eyebrow">Stage 7</div>
         <h2>Review &amp; export</h2>
         <p>The whole prep on one page. Export it as Markdown to drop into your notes, or print it to carry to the wall.</p>
       </div>
